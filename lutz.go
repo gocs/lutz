@@ -1,20 +1,36 @@
-package main
+package lutz
 
 import (
 	"archive/tar"
 	"bufio"
-	"bytes"
 	"compress/gzip"
-	"context"
 	"fmt"
 	"io"
 	"log"
-	"net/http"
-	"net/url"
-	"os"
 	"strings"
 	"sync"
 )
+
+// GetLookupTable returns a lookup table of the timezone data
+func GetLookupTable(r io.Reader, w io.Writer) error {
+
+	var wg sync.WaitGroup
+	// extract the timezone file from the input file
+	in := extr(r)
+
+	// process the timezone file
+	out := proc(in, &wg)
+
+	// sort the timezone file
+	sorted := sort(out)
+
+	// write the sorted timezone file to the output file
+	for _, v := range sorted {
+		w.Write([]byte(v + "\n"))
+	}
+	wg.Wait()
+	return nil
+}
 
 type Key string
 
@@ -38,34 +54,7 @@ var Continents = map[Key]string{
 	SouthAmerica: "southamerica",
 }
 
-const (
-	timezoneFileURL = "https://data.iana.org/time-zones/releases"
-	timezoneFileIn  = "tzdata2025c.tar.gz"
-	timezoneFileOut = "tz"
-)
-
-// dl download the timezone file from the url to the writer
-func dl(ctx context.Context, w io.Writer) error {
-	urlPath, err := url.JoinPath(timezoneFileURL, timezoneFileIn)
-	if err != nil {
-		return fmt.Errorf("error joining url: %w", err)
-	}
-	request, err := http.NewRequestWithContext(ctx, "GET", urlPath, nil)
-	if err != nil {
-		return fmt.Errorf("error creating request: %w", err)
-	}
-	response, err := http.DefaultClient.Do(request)
-	if err != nil {
-		return fmt.Errorf("error doing request: %w", err)
-	}
-	defer response.Body.Close()
-	_, err = io.Copy(w, response.Body)
-	if err != nil {
-		return fmt.Errorf("error copying response body: %w", err)
-	}
-	return nil
-}
-
+// extr extracts the timezone file from the input file line by line
 func extr(r io.Reader) <-chan string {
 	out := make(chan string)
 	go func() {
@@ -102,6 +91,7 @@ func extr(r io.Reader) <-chan string {
 	return out
 }
 
+// proc processes the timezone file to a formatted string (<continent>/<city>/<subcategory> <hour> <minutes>)
 func proc(in <-chan string, wg *sync.WaitGroup) <-chan string {
 	out := make(chan string)
 	wg.Go(func() {
@@ -158,6 +148,7 @@ func proc(in <-chan string, wg *sync.WaitGroup) <-chan string {
 	return out
 }
 
+// sort sorts the timezone file upon insertion
 func sort(in <-chan string) []string {
 	sorted := []string{}
 	for s := range in {
@@ -182,45 +173,4 @@ func sort(in <-chan string) []string {
 func formatOffset(offset string) string {
 	fields := strings.Split(offset, ":")
 	return fmt.Sprintf("%s %s", fields[0], fields[1])
-}
-
-func main() {
-	ctx := context.Background()
-
-	// open the input file for reading from the source
-	fileIn := bytes.NewBuffer(nil)
-	// fileIn, err := os.Open(timezoneFileIn)
-	// if err != nil {
-	// 	log.Fatalf("error opening file: %v", err)
-	// }
-	// defer fileIn.Close()
-
-	// open the output file for writing to the destination
-	fileOut, err := os.Create(timezoneFileOut)
-	if err != nil {
-		log.Fatalf("error creating file: %v", err)
-	}
-	defer fileOut.Close()
-
-	if err := dl(ctx, fileIn); err != nil {
-		log.Fatalf("error downloading file: %v", err)
-	}
-
-	var wg sync.WaitGroup
-
-	// extract the timezone file from the input file
-	in := extr(fileIn)
-
-	// process the timezone file
-	out := proc(in, &wg)
-
-	// sort the timezone file
-	sorted := sort(out)
-
-	// write the sorted timezone file to the output file
-	for _, v := range sorted {
-		fileOut.WriteString(v + "\n")
-	}
-
-	wg.Wait()
 }

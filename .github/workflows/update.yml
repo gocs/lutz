@@ -27,7 +27,7 @@ jobs:
       #   run: go mod download
 
       - name: Build project
-        run: go build ./... # Builds the project
+        run: go build -o lutz cmd/main.go # Builds the project
 
       
       - name: Run lutz binary
