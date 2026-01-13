@@ -21,10 +21,14 @@ merge data in one sorted file
     - every line is sorted per insert
     - every after parsing is appended to the lookup file
 
-## building
+## running
+
+1. install go
+2. run the ff.
 
 ```
-go build ./...
+go build -o lutz cmd/main.go
+./lutz
 ```
 
 ## cron
