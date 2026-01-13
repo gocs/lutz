@@ -1,0 +1,41 @@
+name: update tzdata
+
+on:
+  schedule:
+    # Runs at midnight on the first day of every month in UTC
+    - cron: '0 0 1 * *'
+  # Optional: Allows manual triggering from the GitHub Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: update
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4 # Use the actions/checkout action to access your code
+
+      - name: Set up Go
+        uses: actions/setup-go@v5 # Recommended action for Go environment setup
+        with:
+          go-version: 1.25.0
+          cache: true # Enables intelligent caching for Go modules and build outputs
+
+      #### not needed for now hopefully
+      # - name: Download Go modules
+      #   run: go mod download
+
+      - name: Build project
+        run: go build ./... # Builds the project
+
+      
+      - name: Run lutz binary
+        run: |
+          ./lutz
+
+      - name: Commit and push changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Apply automatic changes # Custom commit message
+          branch: ${{ github.ref_name }}
