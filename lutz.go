@@ -151,20 +151,26 @@ func proc(in <-chan string, wg *sync.WaitGroup) <-chan string {
 // sort sorts the timezone file upon insertion
 func sort(in <-chan string) []string {
 	sorted := []string{}
-	for s := range in {
-		if len(sorted) == 0 {
-			sorted = append(sorted, s)
-			continue
-		}
+	for line := range in {
+		sorted = insert(sorted, line)
+	}
+	return sorted
+}
 
-		// insert s into sorted
-		for _, v := range sorted {
-			// b > a = [a, b]
-			if s > v {
-				sorted = append(sorted, s)
-				break
-			}
+func insert(sorted []string, line string) []string {
+	if len(sorted) == 0 {
+		return append(sorted, line)
+	}
+	sorted = append([]string{line}, sorted...)
+	for i := range sorted {
+		if i == len(sorted)-1 {
+			break
 		}
+		curr, next := sorted[i], sorted[i+1]
+		if curr <= next {
+			break
+		}
+		sorted[i], sorted[i+1] = next, curr
 	}
 	return sorted
 }
