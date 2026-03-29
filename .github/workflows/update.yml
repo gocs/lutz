@@ -14,10 +14,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4 # Use the actions/checkout action to access your code
+        uses: actions/checkout@v6 # Use the actions/checkout action to access your code
 
       - name: Set up Go
-        uses: actions/setup-go@v5 # Recommended action for Go environment setup
+        uses: actions/setup-go@v6 # Recommended action for Go environment setup
         with:
           go-version: 1.25.0
           cache: true # Enables intelligent caching for Go modules and build outputs
