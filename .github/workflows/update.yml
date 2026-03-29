@@ -1,5 +1,8 @@
 name: update tzdata
 
+permissions:
+  contents: write
+
 on:
   schedule:
     # Runs at midnight on the first day of every month in UTC
