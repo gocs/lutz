@@ -1,7 +1,7 @@
 name: update tzdata
 
 permissions:
-  contents: write
+  contents: read  # workflow-level default: read-only
 
 on:
   schedule:
@@ -14,10 +14,14 @@ jobs:
   build:
     name: update
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # only THIS job gets write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6 # Use the actions/checkout action to access your code
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Go
         uses: actions/setup-go@v6 # Recommended action for Go environment setup
@@ -37,8 +41,18 @@ jobs:
         run: |
           ./lutz
 
+      - name: Check for changes
+        id: check-changes
+        run: |
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+
       - name: Commit and push changes
         uses: stefanzweifel/git-auto-commit-action@v7
+        if: steps.check-changes.outputs.has_changes == 'true'
         with:
           commit_message: Apply automatic changes # Custom commit message
           branch: ${{ github.ref_name }}
