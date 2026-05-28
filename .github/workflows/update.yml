@@ -6,7 +6,7 @@ permissions:
 on:
   schedule:
     # Runs at midnight on the first day of every month in UTC
-    - cron: '0 0 1 * *'
+    - cron: '0 0 * * *'
   # Optional: Allows manual triggering from the GitHub Actions tab
   workflow_dispatch:
 
