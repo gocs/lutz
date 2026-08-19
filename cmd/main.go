@@ -14,18 +14,14 @@ import (
 )
 
 const (
-	timezoneFileURL = "https://data.iana.org/time-zones/releases"
-	timezoneFileIn  = "tzdata2025c.tar.gz"
-	timezoneFileOut = "tz"
+	timezoneFileURL    = "https://data.iana.org/time-zones/releases"
+	timezoneReleaseURL = "https://data.iana.org/time-zones/releases?C=M;O=D"
+	timezoneFileOut    = "tz"
 )
 
 // dl download the timezone file from the url to the writer
-func dl(ctx context.Context, w io.Writer) error {
-	urlPath, err := url.JoinPath(timezoneFileURL, timezoneFileIn)
-	if err != nil {
-		return fmt.Errorf("error joining url: %w", err)
-	}
-	request, err := http.NewRequestWithContext(ctx, "GET", urlPath, nil)
+func dl(ctx context.Context, w io.Writer, url string) error {
+	request, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
 		return fmt.Errorf("error creating request: %w", err)
 	}
@@ -43,9 +39,25 @@ func dl(ctx context.Context, w io.Writer) error {
 
 func main() {
 	ctx := context.Background()
+
+	// get latest release
+	releaseHTML := bytes.NewBuffer(nil)
+	if err := dl(ctx, releaseHTML, timezoneReleaseURL); err != nil {
+		log.Fatalf("error downloading release HTML: %v", err)
+	}
+	release, err := lutz.GetLatestRelease(releaseHTML)
+	if err != nil {
+		log.Fatalf("error getting latest release: %v", err)
+	}
+
+	// download the selected file
 	// open the input file for reading from the source
 	fileIn := bytes.NewBuffer(nil)
-	if err := dl(ctx, fileIn); err != nil {
+	urlPath, err := url.JoinPath(timezoneFileURL, release.Name)
+	if err != nil {
+		log.Fatalf("error joining url: %v", err)
+	}
+	if err := dl(ctx, fileIn, urlPath); err != nil {
 		log.Fatalf("error downloading file: %v", err)
 	}
 	// fileIn, err := os.Open(timezoneFileIn)
