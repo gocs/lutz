@@ -2,9 +2,9 @@ Africa/Abidjan 0 00
 Africa/Algiers 1 00
 Africa/Bissau 0 00
 Africa/Cairo 2 00
-Africa/Casablanca 1 00
+Africa/Casablanca 0 00
 Africa/Ceuta 1 00
-Africa/El_Aaiun 1 00
+Africa/El_Aaiun 0 00
 Africa/Johannesburg 2 00
 Africa/Juba 2 00
 Africa/Khartoum 2 00
@@ -57,7 +57,7 @@ America/Dawson -7 00
 America/Dawson_Creek -7 00
 America/Denver -7 00
 America/Detroit -5 00
-America/Edmonton -7 00
+America/Edmonton -6 00
 America/Eirunepe -5 00
 America/El_Salvador -6 00
 America/Fort_Nelson -7 00
@@ -134,7 +134,7 @@ America/Tegucigalpa -6 00
 America/Thule -4 00
 America/Tijuana -8 00
 America/Toronto -5 00
-America/Vancouver -8 00
+America/Vancouver -7 00
 America/Whitehorse -7 00
 America/Winnipeg -6 00
 America/Yakutat -9 00
