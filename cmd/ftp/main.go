@@ -19,7 +19,6 @@ const (
 )
 
 // dl download the timezone file from the url to the writer
-
 func dl(ctx context.Context, w io.Writer, host, path string) error {
 	c, err := ftp.Dial(host, ftp.DialWithContext(ctx))
 	if err != nil {

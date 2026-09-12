@@ -5,7 +5,7 @@ permissions:
 
 on:
   schedule:
-    - cron: '0 0 * * 0'
+    - cron: '0 0 1 * *'
   # Optional: Allows manual triggering from the GitHub Actions tab
   workflow_dispatch:
 
