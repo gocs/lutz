@@ -13,7 +13,7 @@ dl timezone from iana (i.e. eggert/tz)
 parse for each continent
 merge data in one sorted file
 
-- download through http request
+- download through http/ftp
 - unzip a compressed gzip file in memory
 - iterate through all files (only continents)
     - every iteration instatiates a scanner
