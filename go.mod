@@ -2,7 +2,10 @@ module github.com/gocs/lutz
 
 go 1.25.0
 
-require github.com/PuerkitoBio/goquery v1.12.0
+require (
+	github.com/PuerkitoBio/goquery v1.12.0
+	github.com/jlaffaye/ftp v0.2.4
+)
 
 require (
 	github.com/andybalholm/cascadia v1.3.3 // indirect
